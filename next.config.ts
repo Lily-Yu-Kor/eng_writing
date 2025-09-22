@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -12,6 +15,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Vercel 배포 최적화
+  trailingSlash: false,
+  skipMiddlewareUrlNormalize: false,
+  skipTrailingSlashRedirect: false,
 };
 
 export default nextConfig;

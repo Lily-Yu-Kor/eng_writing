@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,7 +34,7 @@ type Essay = {
   characterCount: number;
 };
 
-export default function WritePage() {
+function WritePageContent() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -490,5 +490,20 @@ Seoul is the capital city of Korea..."
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function WritePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <WritePageContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Sparkles, BookOpen, PenTool, List } from 'lucide-react';
+import { Sparkles, BookOpen, PenTool, List, Settings } from 'lucide-react';
 import React from 'react';
 import Link from 'next/link';
 
@@ -45,6 +45,17 @@ export default function Home() {
               <Link href="/essays">
                 <List className="w-4 h-4" />
                 내 글 모음
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="gap-2 w-fit rounded-full px-4 py-3 border-2 border-purple-300 hover:bg-purple-50"
+            >
+              <Link href="/settings">
+                <Settings className="w-4 h-4" />
+                선생님 설정
               </Link>
             </Button>
             <Button

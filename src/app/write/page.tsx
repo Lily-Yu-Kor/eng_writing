@@ -184,10 +184,44 @@ function WritePageContent() {
 
     setIsAnalyzing(true);
     try {
-      // 분석하는 모습을 보여주기 위한 딜레이
+      // 1. 우선 서버-side Gemini API 시도 (환경변수 기반)
+      try {
+        const response = await fetch('/api/ai-feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // 서버-side AI 피드백을 표시 (원본 텍스트로)
+          const aiFeedback: FeedbackItem[] = [
+            {
+              type: 'expression' as const,
+              originalText: '',
+              suggestion: data.feedback,
+              explanation: data.feedback
+            }
+          ];
+
+          setFeedback(aiFeedback);
+          setIsDialogOpen(true);
+          toast({
+            title: "실시간 AI 분석 완료! 🚀",
+            description: "Gemini AI가 상세한 피드백을 제공했어요!",
+          });
+          return;
+        }
+      } catch (apiError) {
+        console.log('Server-side API failed, using offline feedback...');
+      }
+
+      // 2. 폴백: 기본 오프라인 피드백 사용
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 오프라인 규칙 기반 피드백 생성
       const feedbackData = analyzeFeedback(content);
       const feedbackItems = convertToFeedbackItems(feedbackData);
 
@@ -195,13 +229,20 @@ function WritePageContent() {
       setIsDialogOpen(true);
 
       toast({
-        title: "분석 완료! 🎉",
-        description: "AI가 글을 분석했어요. 피드백을 확인해보세요!",
+        title: "기본 피드백 제공 📚",
+        description: "오프라인 AI가 글을 분석했어요. 피드백을 확인해보세요!",
       });
+
     } catch (error) {
+      // 최종 폴백: 기본 피드백
+      const feedbackData = analyzeFeedback(content);
+      const feedbackItems = convertToFeedbackItems(feedbackData);
+      setFeedback(feedbackItems);
+      setIsDialogOpen(true);
+
       toast({
-        title: "분석 실패",
-        description: "다시 시도해주세요.",
+        title: "기본 피드백 제공",
+        description: "네트워크 오류로 오프라인 피드백을 사용합니다.",
         variant: "destructive"
       });
     } finally {

@@ -14,15 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Save, Sparkles, BookOpen, Brain, CheckCircle, Lightbulb, Target, List, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-
-// AI 피드백 타입 정의
-type FeedbackItem = {
-  type: 'grammar' | 'expression' | 'structure' | 'vocabulary';
-  originalText: string;
-  suggestion: string;
-  explanation: string;
-  position?: { start: number; end: number };
-};
+import { analyzeFeedback, convertToFeedbackItems, type FeedbackItem } from '@/lib/feedbackEngine';
 
 // 글 데이터 타입 정의
 type Essay = {
@@ -192,37 +184,14 @@ function WritePageContent() {
 
     setIsAnalyzing(true);
     try {
-      // 실제 AI 분석 대신 모의 피드백 생성
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // 분석하는 모습을 보여주기 위한 딜레이
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const mockFeedback: FeedbackItem[] = [
-        {
-          type: 'grammar',
-          originalText: 'I am go to school',
-          suggestion: 'I go to school',
-          explanation: '"am"과 "go"를 함께 쓸 수 없어요. "I go to school" 또는 "I am going to school"이 맞아요!'
-        },
-        {
-          type: 'expression',
-          originalText: 'very good',
-          suggestion: 'excellent / amazing / wonderful',
-          explanation: '"very good" 대신 더 멋진 표현을 써보세요! "excellent"나 "amazing"은 어떨까요?'
-        },
-        {
-          type: 'structure',
-          originalText: '',
-          suggestion: '도입-본론-결론 구조 사용',
-          explanation: '글의 시작에 주제를 소개하고, 중간에 자세한 설명을, 마지막에 정리를 해보세요!'
-        },
-        {
-          type: 'vocabulary',
-          originalText: 'house',
-          suggestion: 'home / residence / dwelling',
-          explanation: '"house" 대신 "home"(따뜻한 느낌)이나 "residence"(정중한 표현)을 써보세요!'
-        }
-      ];
+      // 오프라인 규칙 기반 피드백 생성
+      const feedbackData = analyzeFeedback(content);
+      const feedbackItems = convertToFeedbackItems(feedbackData);
 
-      setFeedback(mockFeedback);
+      setFeedback(feedbackItems);
       setIsDialogOpen(true);
 
       toast({
